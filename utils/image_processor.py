@@ -151,54 +151,54 @@ let isDragging = false;
 let autoRotationSpeed = 0.2; // Frames pro Animation
 
 // Bild laden
-function loadFrame(frameIndex) {
+function loadFrame(frameIndex) {{
     currentFrame = frameIndex;
     rotationSlider.value = frameIndex;
     currentImage.src = viewerConfig.images[frameIndex].path;
-}
+}}
 
 // Animation starten/stoppen
-function togglePlayPause() {
+function togglePlayPause() {{
     isPlaying = !isPlaying;
     playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
     
-    if (isPlaying) {
+    if (isPlaying) {{
         startAnimation();
-    } else {
+    }} else {{
         stopAnimation();
-    }
-}
+    }}
+}}
 
 // Animation starten
-function startAnimation() {
+function startAnimation() {{
     if (animationId) return;
     
-    function animate() {
+    function animate() {{
         currentFrame = (currentFrame + autoRotationSpeed) % viewerConfig.total_frames;
         loadFrame(Math.floor(currentFrame));
         animationId = requestAnimationFrame(animate);
-    }
+    }}
     
     animationId = requestAnimationFrame(animate);
-}
+}}
 
 // Animation stoppen
-function stopAnimation() {
-    if (animationId) {
+function stopAnimation() {{
+    if (animationId) {{
         cancelAnimationFrame(animationId);
         animationId = null;
-    }
-}
+    }}
+}}
 
 // Event-Listener
 playPauseBtn.addEventListener('click', togglePlayPause);
 
-rotationSlider.addEventListener('input', function() {
+rotationSlider.addEventListener('input', function() {{
     stopAnimation();
     isPlaying = false;
     playPauseBtn.textContent = 'Play';
     loadFrame(parseInt(this.value));
-});
+}});
 
 // Touch/Maus-Steuerung
 const viewer = document.getElementById('viewer360');
@@ -212,16 +212,16 @@ window.addEventListener('touchmove', handleDragMove);
 window.addEventListener('mouseup', handleDragEnd);
 window.addEventListener('touchend', handleDragEnd);
 
-function handleDragStart(event) {
+function handleDragStart(event) {{
     event.preventDefault();
     stopAnimation();
     isPlaying = false;
     playPauseBtn.textContent = 'Play';
     isDragging = true;
     lastDragX = event.clientX || event.touches[0].clientX;
-}
+}}
 
-function handleDragMove(event) {
+function handleDragMove(event) {{
     if (!isDragging) return;
     event.preventDefault();
     
@@ -234,25 +234,25 @@ function handleDragMove(event) {
     const newFrame = Math.floor((currentFrame + framesToMove + viewerConfig.total_frames) % viewerConfig.total_frames);
     
     loadFrame(newFrame);
-}
+}}
 
-function handleDragEnd() {
+function handleDragEnd() {{
     if (!isDragging) return;
     isDragging = false;
     
     // Automatische Rotation nach Mausinteraktion fortsetzen
-    if (!isPlaying) {
+    if (!isPlaying) {{
         isPlaying = true;
         playPauseBtn.textContent = 'Pause';
         startAnimation();
-    }
-}
+    }}
+}}
 
 // Initialisierung
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {{
     loadFrame(0);
     startAnimation();
-});
+}});
 '''.replace('{JSON_CONFIG}', json.dumps(config, indent=4))
     
     def _get_viewer_css_template(self):
