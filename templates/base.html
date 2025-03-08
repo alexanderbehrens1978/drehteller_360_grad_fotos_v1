@@ -1,0 +1,58 @@
+<!-- Datei: templates/base.html - Basis-Template für alle Seiten -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}360° Drehteller Fotografie-System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <nav class="main-nav">
+            <div class="logo">
+                <h1>360° Drehteller</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Projekte</a></li>
+                <li><a href="{{ url_for('app_settings') }}">Einstellungen</a></li>
+            </ul>
+        </nav>
+        
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+        
+        <footer class="main-footer">
+            <p>360° Drehteller Fotografie-System &copy; 2025</p>
+        </footer>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+
+<!-- Datei: templates/index.html - Hauptseite mit Projekten -->
+{% extends "base.html" %}
+
+{% block title %}Projekte - 360° Drehteller Fotografie-System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Projekte</h2>
+    <a href="{{ url_for('new_project') }}" class="btn primary-btn">Neues Projekt</a>
+</div>
+
+<div class="projects-container">
+    {% if projects %}
+        {% for project in projects %}
+            <div class="project-card">
+                <div class="project-header">
+                    <h3>{{ project.name }}</h3>
+                    <span class="project-date">Erstellt: {{ project.created_at|datetime }}</span>
+                </div>
+                <div class="project-description">
+                    <p>{{ project.description }}</p>
+                </div>
