@@ -227,4 +227,147 @@ document.addEventListener('DOMContentLoaded', function() {
     // Elemente
     const currentImage = document.getElementById('currentImage');
     const rotationSlider = document.getElementById('rotationSlider');
-    const playPauseBtn = document.getElementById('playPause
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const downloadBtn = document.getElementById('download-btn');
+    
+    // Variablen
+    let currentFrame = 0;
+    let isPlaying = true;
+    let animationId = null;
+    let lastDragX = 0;
+    let isDragging = false;
+    let autoRotationSpeed = 0.2; // Frames pro Animation
+    
+    // Photos sortieren und aufbereiten
+    const photos = [...sessionData.photos].sort((a, b) => a.angle - b.angle);
+    
+    // Slider konfigurieren
+    rotationSlider.min = 0;
+    rotationSlider.max = photos.length - 1;
+    rotationSlider.value = 0;
+    
+    // Bild laden
+    function loadFrame(frameIndex) {
+        currentFrame = frameIndex;
+        rotationSlider.value = frameIndex;
+        currentImage.src = photos[frameIndex].path;
+    }
+    
+    // Animation starten/stoppen
+    function togglePlayPause() {
+        isPlaying = !isPlaying;
+        playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
+        
+        if (isPlaying) {
+            startAnimation();
+        } else {
+            stopAnimation();
+        }
+    }
+    
+    // Animation starten
+    function startAnimation() {
+        if (animationId) return;
+        
+        function animate() {
+            currentFrame = (currentFrame + autoRotationSpeed) % photos.length;
+            loadFrame(Math.floor(currentFrame));
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        animationId = requestAnimationFrame(animate);
+    }
+    
+    // Animation stoppen
+    function stopAnimation() {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+    }
+    
+    // Export-Funktion
+    async function exportViewer() {
+        try {
+            const response = await window.api.post('/api/export/360', {
+                project_id: sessionData.project_id,
+                session_id: sessionData.session_id
+            });
+            
+            if (response.success && response.export_url) {
+                window.open(response.export_url, '_blank');
+            } else {
+                alert('Export fehlgeschlagen: ' + (response.error || 'Unbekannter Fehler'));
+            }
+        } catch (error) {
+            alert('Export fehlgeschlagen: ' + error.message);
+        }
+    }
+    
+    // Event-Listener
+    playPauseBtn.addEventListener('click', togglePlayPause);
+    
+    rotationSlider.addEventListener('input', function() {
+        stopAnimation();
+        isPlaying = false;
+        playPauseBtn.textContent = 'Play';
+        loadFrame(parseInt(this.value));
+    });
+    
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            exportViewer();
+        });
+    }
+    
+    // Touch/Maus-Steuerung
+    viewer.addEventListener('mousedown', handleDragStart);
+    viewer.addEventListener('touchstart', handleDragStart);
+    
+    window.addEventListener('mousemove', handleDragMove);
+    window.addEventListener('touchmove', handleDragMove);
+    
+    window.addEventListener('mouseup', handleDragEnd);
+    window.addEventListener('touchend', handleDragEnd);
+    
+    function handleDragStart(event) {
+        event.preventDefault();
+        stopAnimation();
+        isPlaying = false;
+        playPauseBtn.textContent = 'Play';
+        isDragging = true;
+        lastDragX = event.clientX || event.touches[0].clientX;
+    }
+    
+    function handleDragMove(event) {
+        if (!isDragging) return;
+        event.preventDefault();
+        
+        const clientX = event.clientX || event.touches[0].clientX;
+        const deltaX = clientX - lastDragX;
+        lastDragX = clientX;
+        
+        // Berechne die Anzahl der zu verschiebenden Frames
+        const framesToMove = -Math.sign(deltaX) * Math.ceil(Math.abs(deltaX) / 10);
+        const newFrame = Math.floor((currentFrame + framesToMove + photos.length) % photos.length);
+        
+        loadFrame(newFrame);
+    }
+    
+    function handleDragEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        // Automatische Rotation nach Mausinteraktion fortsetzen
+        if (!isPlaying) {
+            isPlaying = true;
+            playPauseBtn.textContent = 'Pause';
+            startAnimation();
+        }
+    }
+    
+    // Initialisierung
+    loadFrame(0);
+    startAnimation();
+});
