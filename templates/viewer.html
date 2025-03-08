@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{PROJECT_NAME}} - 360° Ansicht</title>
+    <link rel="stylesheet" href="css/viewer.css">
+</head>
+<body>
+    <div class="viewer-container">
+        <div class="viewer-header">
+            <h1>{{PROJECT_NAME}}</h1>
+            <p>{{SESSION_NAME}}</p>
+        </div>
+        
+        <div class="viewer-content">
+            <div id="viewer360" class="viewer-360">
+                <img id="currentImage" src="images/frame_000.jpg" alt="360° Ansicht">
+                <div class="viewer-controls">
+                    <button id="playPauseBtn" class="control-btn">Pause</button>
+                    <input type="range" id="rotationSlider" min="0" max="{{MAX_FRAMES}}" value="0" class="slider">
+                </div>
+            </div>
+        </div>
+        
+        <div class="viewer-footer">
+            <p>Erstellt mit 360° Drehteller Fotografie-System</p>
+        </div>
+    </div>
+    
+    <script src="js/viewer.js"></script>
+</body>
+</html>
