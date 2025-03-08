@@ -1,0 +1,20 @@
+# Datei: requirements.txt
+# Python-Abhängigkeiten für das 360° Drehteller Fotografie-System
+
+# Webframework
+Flask==2.2.3
+Werkzeug==2.2.3
+Jinja2==3.1.2
+
+# Serielle Kommunikation
+pyserial==3.5
+
+# Bildverarbeitung
+opencv-python==4.7.0.72
+Pillow==9.4.0
+
+# Kamerasteuerung
+gphoto2==2.3.4  # Optional, nur wenn DSLR-Kameras verwendet werden sollen
+
+# Utilities
+python-dotenv==1.0.0
