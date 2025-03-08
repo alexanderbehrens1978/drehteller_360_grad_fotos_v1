@@ -200,6 +200,55 @@ def api_capture_photo():
     
     return jsonify({'success': success, 'path': photo_path if success else None})
 
+@app.route('/viewer/<project_id>/<session_id>')
+def view_360(project_id, session_id):
+    """360°-Viewer für eine Fotosession anzeigen"""
+    project = project_manager.get_project(project_id)
+    if not project:
+        return redirect(url_for('index'))
+    
+    session = project.get_session(session_id)
+    if not session:
+        return redirect(url_for('view_project', project_id=project_id))
+    
+    return render_template('viewer.html', project=project, session=session)
+
+@app.route('/logs')
+def view_logs():
+    """Anzeige der Anwendungslogs"""
+    log_file = os.path.join(os.path.dirname(__file__), 'app.log')
+    logs = []
+    
+    try:
+        if os.path.exists(log_file):
+            with open(log_file, 'r') as f:
+                logs = f.readlines()
+                logs.reverse()  # Neueste Logs zuerst
+        else:
+            logs = ["Keine Logdatei gefunden."]
+    except Exception as e:
+        logs = [f"Fehler beim Lesen der Logdatei: {str(e)}"]
+    
+    return render_template('logs.html', logs=logs)
+
+@app.route('/logs')
+def view_logs():
+    """Anzeige der Anwendungslogs"""
+    log_file = os.path.join(os.path.dirname(__file__), 'app.log')
+    logs = []
+    
+    try:
+        if os.path.exists(log_file):
+            with open(log_file, 'r') as f:
+                logs = f.readlines()
+                logs.reverse()  # Neueste Logs zuerst
+        else:
+            logs = ["Keine Logdatei gefunden."]
+    except Exception as e:
+        logs = [f"Fehler beim Lesen der Logdatei: {str(e)}"]
+    
+    return render_template('logs.html', logs=logs)
+
 if __name__ == '__main__':
     # Beim Start der Anwendung die Controller initialisieren
     try:
