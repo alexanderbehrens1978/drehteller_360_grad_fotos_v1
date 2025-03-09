@@ -129,3 +129,46 @@ def take_photo(filename=None):
         import traceback
         traceback.print_exc()
         return None
+else:
+            # Webcam mit OpenCV
+            print(f"Versuche, Foto mit OpenCV aufzunehmen: {camera_device}")
+            try:
+                import cv2
+                cap = cv2.VideoCapture(camera_device)
+                
+                # Auflösung einstellen
+                width = config_manager.get('camera.resolution.width', 1280)
+                height = config_manager.get('camera.resolution.height', 720)
+                cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+                cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+                
+                # Foto aufnehmen
+                ret, frame = cap.read()
+                if not ret:
+                    raise Exception(f"Fehler beim Auslesen der Kamera: {camera_device}")
+                    
+                # Foto speichern
+                cv2.imwrite(output_path, frame)
+                cap.release()
+            except ImportError:
+                print("OpenCV nicht installiert, verwende fswebcam als Fallback")
+                
+                # Fallback zu fswebcam, wenn OpenCV nicht verfügbar ist
+                try:
+                    subprocess.run([
+                        'fswebcam',
+                        '--no-banner',
+                        '--resolution', f"{width}x{height}",
+                        '-d', camera_device,
+                        output_path
+                    ], check=True)
+                except subprocess.CalledProcessError as e:
+                    raise Exception(f"Fehler bei fswebcam: {e}")
+            
+        print(f"Foto aufgenommen und gespeichert als: {filename}")
+        return filename
+    except Exception as e:
+        print(f"Fehler beim Aufnehmen des Fotos: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
